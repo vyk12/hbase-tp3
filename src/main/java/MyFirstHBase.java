@@ -180,24 +180,38 @@ public class MyFirstHBase {
 
     // ArrayList to ArrayWriter conversion methods
 
+    /**
+     * Convert an ArrayList<String> to an ArrayWritable
+     */
     public Writable toWritable(ArrayList<String> list) {
+        // Create an array of Writable of the same size as the given ArrayList
         Writable[] content = new Writable[list.size()];
 
+        // Add each element of the given ArrayList to the content array
+        // Each element is represented as an instance of Text
         for (int i = 0; i < content.length; i++) {
             content[i] = new Text(list.get(i));
         }
 
+        // The ArrayWritable representation of content is returned
         return new ArrayWritable(Text.class, content);
     }
 
+    /**
+     * Convert an ArrayWritable to an ArrayList<String>
+     */
     public ArrayList<String> fromWritable(ArrayWritable writable) {
+        // Retrieve the ArrayWritable as an array of Writable
         Writable[] writables = ((ArrayWritable) writable).get();
+        // Create an ArrayList<String> of the same size as the given ArrayWritable
         ArrayList<String> list = new ArrayList<String>(writables.length);
 
+        // For each Writable, add the String equivalent to the ArrayList<String> list
         for (Writable wrt : writables) {
             list.add(((Text)wrt).toString());
         }
 
+        // The final ArrayList<String> list is returned
         return list;
     }
 
@@ -259,7 +273,9 @@ public class MyFirstHBase {
             }
         } while("".equals(bff));
 
+        // New user instance is created
         User user = new User(name, email, age, bff, new ArrayList<String>());
+        // Save user
         saveUser(user);
     }
 
@@ -354,13 +370,19 @@ public class MyFirstHBase {
             MyFirstHBase myfirsthbase = new MyFirstHBase();
 
             myfirsthbase.conf = HBaseConfiguration.create();
+            // In the default configuration, the following parameter is set to "/hbase", which is not the case on the server
             myfirsthbase.conf.set("zookeeper.znode.parent", "/hbase-unsecure");
+            // Establish connection
             myfirsthbase.connection = ConnectionFactory.createConnection(myfirsthbase.conf);
+            // Get the table the program will work on
             myfirsthbase.table = myfirsthbase.connection.getTable(myfirsthbase.tableName);
 
+            // Set root logger to WARN in order not to have every single information message
             Logger.getRootLogger().setLevel(Level.WARN);
 
+            // The table has two column families: info and friends
             String[] families = { "info", "friends" };
+            // Create the table given the two previous column families
             myfirsthbase.createTable(families);
 
             Scanner sc = new Scanner(System.in);
